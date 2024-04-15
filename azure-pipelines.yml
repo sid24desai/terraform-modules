@@ -15,7 +15,7 @@ steps:
 - checkout: self
   persistCredentials: true  # Ensure credentials are persisted for fetching code from GitHub
 
-- task: TerraformInstaller@0
+- task: TerraformInstaller@1
   inputs:
     terraformVersion: 'latest'
 
