@@ -1,0 +1,33 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+      - main  # Adjust this to match your main branch name
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- checkout: self
+  persistCredentials: true  # Ensure credentials are persisted for fetching code from GitHub
+
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: 'latest'
+
+- script: |
+    terraform init
+    terraform plan -var "resource_group_name=desaisilregrp8" -var "location=East US" -out=tfplan
+  displayName: 'Terraform Init and Plan'
+
+- script: |
+    terraform apply tfplan
+  displayName: 'Terraform Apply'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+
+
