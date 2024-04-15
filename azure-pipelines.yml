@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
   branches:
     include:
@@ -19,15 +14,23 @@ steps:
   inputs:
     terraformVersion: 'latest'
 
-- script: |
-    terraform init
-    terraform plan -var "resource_group_name=desaisilregrp8" -var "location=East US" -out=tfplan
-  displayName: 'Terraform Init and Plan'
+- task: TerraformCLI@1
+  displayName: 'Terraform Init'
+  inputs:
+    command: 'init'
 
-- script: |
-    terraform apply tfplan
+- task: TerraformCLI@1
+  displayName: 'Terraform Plan'
+  inputs:
+    command: 'plan'
+    commandOptions: '-out=tfplan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'  # Use the default working directory
+
+- task: TerraformCLI@1
   displayName: 'Terraform Apply'
+  inputs:
+    command: 'apply'
+    commandOptions: 'tfplan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'  # Use the default working directory
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-
-
 
